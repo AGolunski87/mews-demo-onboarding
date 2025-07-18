@@ -1,0 +1,37 @@
+enum OnboardingStep {
+  propertyName,
+  propertyType,
+  region,
+  numberOfRooms,
+  brandingLogo,
+  brandingColor,
+  featureFocus,
+  facilities,
+  startRoomLoop,
+  roomName,
+  roomCount,
+  roomPrice,
+  roomCleaningTime,
+  roomImages,
+  askAddAnotherRoom,
+  summaryConfirm,
+}
+
+const Map<OnboardingStep, String> onboardingPrompts = {
+  OnboardingStep.propertyName: "What’s the name of your hotel?",
+  OnboardingStep.propertyType: "What type of property is it?",
+  OnboardingStep.region: "Where is it located?",
+  OnboardingStep.numberOfRooms: "How many rooms does your hotel have?",
+  OnboardingStep.brandingLogo: "Upload your logo or skip.",
+  OnboardingStep.brandingColor: "Pick a theme color (or use default).",
+  OnboardingStep.featureFocus: "What Mews features are you most interested in?",
+  OnboardingStep.facilities: "Any special facilities you'd like to include?",
+  OnboardingStep.roomName: "What’s the name of this room type?",
+  OnboardingStep.roomCount: "How many of this room type do you have?",
+  OnboardingStep.roomPrice: "What’s the nightly rate?",
+  OnboardingStep.roomCleaningTime: "How long does it take to clean one?",
+  OnboardingStep.roomImages: "Upload 1–3 pictures of this room.",
+  OnboardingStep.askAddAnotherRoom: "Would you like to add another room type?",
+  OnboardingStep.summaryConfirm:
+      "Here’s a summary of your hotel. Ready to generate your demo?",
+};

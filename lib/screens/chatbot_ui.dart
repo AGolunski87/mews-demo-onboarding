@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ai_toolkit/flutter_ai_toolkit.dart';
 import 'package:lottie/lottie.dart';
+import '../services/chat_controller.dart';
+import '../services/onboarding_step.dart';
+import '../models/property_details.dart';
 import 'demo_dashboard.dart';
 
 class AiMessage {
@@ -43,89 +45,42 @@ class HotelOnboardingBot extends StatefulWidget {
 
 class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
   final TextEditingController _textController = TextEditingController();
+  final ChatController chatController = ChatController();
+  final List<AiMessage> _messages = [];
 
-  final List<AiMessage> _messages = [
-    AiMessage.system(
-      "🧙‍♂️ Welcome, I can get you started with Mews in seconds.",
-    ),
-    AiMessage.ai("I just need a few enchanted details first."),
-  ];
-
-  int _step = 0;
-  String propertyName = '';
-  String propertyType = '';
-  String region = '';
-  String focus = '';
+  @override
+  void initState() {
+    super.initState();
+    _messages.addAll([
+      AiMessage.system(
+        "🧙‍♂️ Welcome, I can get you started with Mews in seconds.",
+      ),
+      AiMessage.ai(chatController.prompt),
+    ]);
+  }
 
   void _handleMessageSend(String input) {
     if (input.isEmpty) return;
+
     setState(() {
       _messages.add(AiMessage.user(input));
-      _step++;
-      _handleNextStep(input);
-      _textController.clear();
-    });
-  }
+      chatController.saveResponse(input);
 
-  void _handleNextStep(String input) {
-    switch (_step) {
-      case 1:
-        propertyName = input;
-        _messages.add(
-          AiMessage.ai("Great! What type of magical property is it?"),
-        );
-        break;
-      case 2:
-        propertyType = input;
-        _messages.add(
-          AiMessage.ai(
-            "Wondrous! Where is it located, or how many rooms does it have?",
-          ),
-        );
-        break;
-      case 3:
-        region = input;
-        _messages.add(AiMessage.ai("And your focus of power?"));
-        break;
-      case 4:
-        focus = input;
-        _messages.add(AiMessage.ai("I'm conjuring your personalized demo..."));
+      if (chatController.currentStep == OnboardingStep.summaryConfirm) {
+        final details = chatController.buildPropertyDetails();
         _messages.add(
           AiMessage.functionCall(
             functionName: "generateDemo",
-            arguments:
-                "{ property: '$propertyName', type: '$propertyType', region: '$region', focus: '$focus' }",
+            arguments: details.toJson().toString(),
           ),
         );
-        Future.delayed(const Duration(milliseconds: 600), () {
-          _showScrollDialog(context);
-        });
-        break;
-    }
-  }
+        _showScrollDialog(context);
+      } else {
+        _messages.add(AiMessage.ai(chatController.prompt));
+      }
 
-  List<String> _getSuggestions() {
-    switch (_step) {
-      case 1:
-        return [
-          'Boutique Tower',
-          'Resort Keep',
-          'Forest Hostel',
-          'B&B Cottage',
-        ];
-      case 3:
-        return ['🧹 Housekeeping', '🗝️ Front Desk', '🔮 Self Check-in'];
-      default:
-        return [];
-    }
-  }
-
-  void _navigateToDashboard() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => DemoDashboard(propertyName: propertyName),
-      ),
-    );
+      _textController.clear();
+    });
   }
 
   void _showScrollDialog(BuildContext context) {
@@ -152,6 +107,15 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
             const Text("Unfolding your demo..."),
           ],
         ),
+      ),
+    );
+  }
+
+  void _navigateToDashboard() {
+    final propertyName = chatController.buildPropertyDetails().propertyName;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => DemoDashboard(propertyName: propertyName),
       ),
     );
   }
@@ -221,21 +185,6 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
               },
             ),
           ),
-          if (_getSuggestions().isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                spacing: 8,
-                children: _getSuggestions()
-                    .map(
-                      (s) => ActionChip(
-                        label: Text(s),
-                        onPressed: () => _handleMessageSend(s),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -245,7 +194,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                     controller: _textController,
                     onSubmitted: _handleMessageSend,
                     decoration: const InputDecoration(
-                      hintText: 'property details...',
+                      hintText: 'Your answer here...',
                       border: OutlineInputBorder(),
                     ),
                   ),
