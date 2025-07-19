@@ -110,16 +110,6 @@ class _RoomTypeEditorCardState extends State<RoomTypeEditorCard> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: "Cleaning Time",
-                      suffixText: "mins",
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
               ],
             ),
 

@@ -9,7 +9,7 @@ class ChatController {
 
   final List<Room> _rooms = [];
   Room? _tempRoom;
-  int? _totalRoomTypes;
+  int? _totalRoomTypes = 0;
   int _currentRoomIndex = 1;
 
   OnboardingStep get currentStep => _currentStep;
@@ -47,7 +47,7 @@ class ChatController {
       propertyName: _responses[OnboardingStep.propertyName],
       propertyType: _responses[OnboardingStep.propertyType],
       region: _responses[OnboardingStep.region],
-      numberOfRooms: _totalRoomTypes ?? _rooms.length,
+      numberOfRooms: _rooms.length,
       featureFocus: List<String>.from(
         _responses[OnboardingStep.featureFocus] ?? [],
       ),
@@ -58,9 +58,24 @@ class ChatController {
         logoUrl: _responses[OnboardingStep.brandingLogo] ?? '',
         themeColor: _responses[OnboardingStep.brandingColor] ?? '#336699',
       ),
-      roomTypes: [], // deprecated for flat room model
+      roomTypes: [],
       rooms: _rooms,
     );
+  }
+
+  String getReadableSummary() {
+    final name = _responses[OnboardingStep.propertyName] ?? 'My property';
+    final type = _responses[OnboardingStep.propertyType] ?? 'a hotel';
+    final count = _totalRoomTypes ?? _rooms.length;
+    final region = _responses[OnboardingStep.region] ?? 'an unknown location';
+    return "My property, $name, $type with $count rooms in $region.";
+  }
+
+  void finalizeSetup() {
+    // Optional: logging or local completion marker
+    if (_currentStep == OnboardingStep.numberOfRoomsTypes) {
+      _advanceStep();
+    }
   }
 
   void reset() {
