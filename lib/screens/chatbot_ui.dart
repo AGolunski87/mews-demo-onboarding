@@ -6,37 +6,8 @@ import '../models/property_details.dart';
 import 'demo_dashboard.dart';
 import '/widgets/shared/components.dart';
 import '/widgets/shared/drawer.dart';
-
-class AiMessage {
-  final String text;
-  final bool isUser;
-  final bool isFunctionCall;
-  final String? functionName;
-  final String? arguments;
-
-  AiMessage.user(this.text)
-    : isUser = true,
-      isFunctionCall = false,
-      functionName = null,
-      arguments = null;
-
-  AiMessage.ai(this.text)
-    : isUser = false,
-      isFunctionCall = false,
-      functionName = null,
-      arguments = null;
-
-  AiMessage.system(this.text)
-    : isUser = false,
-      isFunctionCall = false,
-      functionName = null,
-      arguments = null;
-
-  AiMessage.functionCall({required this.functionName, required this.arguments})
-    : isUser = false,
-      isFunctionCall = true,
-      text = "🧾 Casting scroll spell...";
-}
+import '../models/ai_message.dart';
+import '../widgets/chat/chat_message.dart';
 
 class HotelOnboardingBot extends StatefulWidget {
   const HotelOnboardingBot({super.key});
@@ -151,48 +122,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                     itemCount: _messages.length,
                     itemBuilder: (context, index) {
                       final msg = _messages[index];
-                      final isBot = !msg.isUser;
-                      return Align(
-                        alignment: msg.isUser
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: msg.isUser
-                              ? MainAxisAlignment.end
-                              : MainAxisAlignment.start,
-                          children: [
-                            if (isBot)
-                              Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: Image.asset(
-                                  'web/assets/wizard.png',
-                                  height: 32,
-                                ),
-                              ),
-                            Flexible(
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(vertical: 4),
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: msg.isUser
-                                      ? Colors.indigo
-                                      : Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  msg.text,
-                                  style: TextStyle(
-                                    color: msg.isUser
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
+                      return ChatMessage(message: msg);
                     },
                   ),
                 ),
