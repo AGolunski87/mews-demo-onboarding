@@ -1,16 +1,18 @@
-# mews_onboarding
+# Mews Onboarding
 
-A new Flutter project.
+A Flutter demo showing a hotel onboarding chatbot. It collects basic
+information and then displays a demo dashboard.
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for an overview of the code
+structure and contribution guidelines.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Install Flutter and run:
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+flutter run -d chrome
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+This will launch the web version with hot reload.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
