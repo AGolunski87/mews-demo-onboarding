@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'room_type.dart';
 import 'branding.dart';
+import 'room.dart';
 
 part 'property_details.g.dart';
 
@@ -13,7 +14,9 @@ class PropertyDetails {
   final List<String> featureFocus;
   final List<String> facilities;
   final Branding branding;
-  final List<RoomType> roomTypes;
+
+  final List<RoomType> roomTypes; // e.g., "Deluxe", "Suite", etc.
+  final List<Room> rooms; // One entry per room, by number
 
   PropertyDetails({
     required this.propertyName,
@@ -24,6 +27,7 @@ class PropertyDetails {
     required this.facilities,
     required this.branding,
     required this.roomTypes,
+    required this.rooms,
   });
 
   factory PropertyDetails.fromJson(Map<String, dynamic> json) =>

@@ -4,6 +4,8 @@ import '../services/chat_controller.dart';
 import '../services/onboarding_step.dart';
 import '../models/property_details.dart';
 import 'demo_dashboard.dart';
+import '/widgets/shared/components.dart';
+import '/widgets/shared/drawer.dart';
 
 class AiMessage {
   final String text;
@@ -47,6 +49,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
   final TextEditingController _textController = TextEditingController();
   final ChatController chatController = ChatController();
   final List<AiMessage> _messages = [];
+  bool _showRoomDrawer = false;
 
   @override
   void initState() {
@@ -77,6 +80,10 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
         _showScrollDialog(context);
       } else {
         _messages.add(AiMessage.ai(chatController.prompt));
+
+        if (chatController.currentStep == OnboardingStep.numberOfRoomsTypes) {
+          _showRoomDrawer = true;
+        }
       }
 
       _textController.clear();
@@ -124,89 +131,102 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F0E7),
-      body: Column(
+      body: Stack(
         children: [
-          const SizedBox(height: 40),
-          Lottie.asset('web/assets/bot.json', height: 120),
-          const Text(
-            "Onboarding Wizard",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Serif',
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final msg = _messages[index];
-                final isBot = !msg.isUser;
-                return Align(
-                  alignment: msg.isUser
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: msg.isUser
-                        ? MainAxisAlignment.end
-                        : MainAxisAlignment.start,
-                    children: [
-                      if (isBot)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Image.asset(
-                            'web/assets/wizard.png',
-                            height: 32,
-                          ),
-                        ),
-                      Flexible(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: msg.isUser
-                                ? Colors.indigo
-                                : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            msg.text,
-                            style: TextStyle(
-                              color: msg.isUser ? Colors.white : Colors.black,
+          Column(
+            children: [
+              const SizedBox(height: 40),
+              Lottie.asset('web/assets/bot.json', height: 120),
+              const Text(
+                "Onboarding Wizard",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Serif',
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = _messages[index];
+                    final isBot = !msg.isUser;
+                    return Align(
+                      alignment: msg.isUser
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: msg.isUser
+                            ? MainAxisAlignment.end
+                            : MainAxisAlignment.start,
+                        children: [
+                          if (isBot)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: Image.asset(
+                                'web/assets/wizard.png',
+                                height: 32,
+                              ),
+                            ),
+                          Flexible(
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: msg.isUser
+                                    ? Colors.indigo
+                                    : Colors.grey[200],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                msg.text,
+                                style: TextStyle(
+                                  color: msg.isUser
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                              ),
                             ),
                           ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _textController,
+                        onSubmitted: _handleMessageSend,
+                        decoration: const InputDecoration(
+                          hintText: 'Your answer here...',
+                          border: OutlineInputBorder(),
                         ),
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _textController,
-                    onSubmitted: _handleMessageSend,
-                    decoration: const InputDecoration(
-                      hintText: 'Your answer here...',
-                      border: OutlineInputBorder(),
                     ),
-                  ),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: () =>
+                          _handleMessageSend(_textController.text.trim()),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: () =>
-                      _handleMessageSend(_textController.text.trim()),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
+          if (_showRoomDrawer)
+            RoomTypeDrawer(
+              numberOfRoomTypes: chatController.totalRoomTypes ?? 4,
+            ),
         ],
       ),
     );
