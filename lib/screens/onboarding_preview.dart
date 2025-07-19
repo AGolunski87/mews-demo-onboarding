@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/shared/RoomTypeEditorCard.dart';
 
 class OnboardingPreviewScreen extends StatelessWidget {
   const OnboardingPreviewScreen({super.key});
@@ -89,93 +90,3 @@ class OnboardingPreviewScreen extends StatelessWidget {
   }
 }
 
-class RoomTypeEditorCard extends StatelessWidget {
-  final String typeName;
-  const RoomTypeEditorCard({super.key, required this.typeName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              typeName,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 12),
-
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: "# of Rooms",
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: "Occupancy",
-                      suffixText: "guests",
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: "Nightly Rate",
-                      prefixText: "\$",
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: "Cleaning Time",
-                      suffixText: "mins",
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Text("Upload Room Image:"),
-                const SizedBox(width: 12),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.image),
-                  label: const Text("Add Image"),
-                  onPressed: () {},
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
