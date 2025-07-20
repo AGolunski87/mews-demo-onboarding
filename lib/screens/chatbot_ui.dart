@@ -220,6 +220,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                     onFinish: (totalRooms) {
                       chatController.setTotalRooms(totalRooms);
                       chatController.saveResponse('done');
+                      chatController.finalizeSetup();
                       final nextStep = chatController.currentStep;
 
                       setState(() {
