@@ -188,16 +188,19 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                     ),
                     const SizedBox(height: 12),
                     for (int i = 0; i < roomCardCount; i++)
-                      RoomTypeEditorCard(
-                        key: ValueKey('room-type-${i + 1}'),
-                        typeName: defaultRoomTypes[i],
-                        editableName: true,
-                        onRoomTypeChanged: (room) {
-                          setState(() {
-                            roomTypeStates[i] = room;
-                          });
-                        },
-                      ),
+                      (() {
+                        final index = i;
+                        return RoomTypeEditorCard(
+                          key: ValueKey('room-type-${index + 1}'),
+                          typeName: defaultRoomTypes[index],
+                          editableName: true,
+                          onRoomTypeChanged: (room) {
+                            setState(() {
+                              roomTypeStates[index] = room;
+                            });
+                          },
+                        );
+                      })(),
                     const SizedBox(height: 20),
                     if (_botTyping)
                       const Center(
