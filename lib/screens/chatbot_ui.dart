@@ -50,7 +50,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
         );
         _showScrollDialog(context);
       } else {
-        _messages.add(AiMessage.custom(const AiFinalMessage()));
+        _messages.add(AiMessage.ai(chatController.prompt));
       }
 
       _textController.clear();
@@ -217,7 +217,8 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                   child: RoomTypeDrawer(
                     numberOfRoomTypes: chatController.totalRoomTypes ?? 4,
                     summaryText: '',
-                    onFinish: () {
+                    onFinish: (totalRooms) {
+                      chatController.setTotalRooms(totalRooms);
                       chatController.saveResponse('done');
                       final nextStep = chatController.currentStep;
 

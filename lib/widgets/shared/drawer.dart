@@ -4,7 +4,7 @@ import 'RoomTypeEditorCard.dart';
 class RoomTypeDrawer extends StatefulWidget {
   final int numberOfRoomTypes;
   final String summaryText;
-  final VoidCallback onFinish;
+  final Function(int totalRooms) onFinish;
 
   const RoomTypeDrawer({
     super.key,
@@ -43,6 +43,16 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
     roomCardCount = widget.numberOfRoomTypes;
   }
 
+  @override
+  void didUpdateWidget(covariant RoomTypeDrawer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.numberOfRoomTypes != oldWidget.numberOfRoomTypes) {
+      setState(() {
+        roomCardCount = widget.numberOfRoomTypes;
+      });
+    }
+  }
+
   void addRoom() {
     setState(() {
       roomCardCount++;
@@ -58,7 +68,7 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
   void completeSetup() {
     setState(() => _botTyping = true);
     Future.delayed(const Duration(milliseconds: 600), () {
-      widget.onFinish();
+      widget.onFinish(totalRooms);
       if (mounted) {
         setState(() {
           _botTyping = false;
