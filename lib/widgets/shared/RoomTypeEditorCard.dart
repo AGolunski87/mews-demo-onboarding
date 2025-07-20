@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 class RoomTypeEditorCard extends StatefulWidget {
   final String typeName;
   final bool editableName;
+  final int initialCount;
+  final ValueChanged<int>? onCountChanged;
+
   const RoomTypeEditorCard({
     super.key,
     required this.typeName,
     this.editableName = false,
+    this.initialCount = 1,
+    this.onCountChanged,
   });
 
   @override
@@ -15,17 +20,21 @@ class RoomTypeEditorCard extends StatefulWidget {
 
 class _RoomTypeEditorCardState extends State<RoomTypeEditorCard> {
   late TextEditingController _nameController;
+  late TextEditingController _countController;
   bool _editingName = false;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.typeName);
+    _countController =
+        TextEditingController(text: widget.initialCount.toString());
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _countController.dispose();
     super.dispose();
   }
   // Removed invalid constructor and field declaration.
@@ -75,11 +84,16 @@ class _RoomTypeEditorCardState extends State<RoomTypeEditorCard> {
               children: [
                 Expanded(
                   child: TextField(
+                    controller: _countController,
                     decoration: const InputDecoration(
                       labelText: "# of Rooms",
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
+                    onChanged: (val) {
+                      final count = int.tryParse(val) ?? 0;
+                      widget.onCountChanged?.call(count);
+                    },
                   ),
                 ),
                 const SizedBox(width: 16),
