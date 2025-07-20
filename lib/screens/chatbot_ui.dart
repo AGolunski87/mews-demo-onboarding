@@ -4,11 +4,9 @@ import '../services/chat_controller.dart';
 import '../services/onboarding_step.dart';
 import '../models/property_details.dart';
 import 'demo_dashboard.dart';
-import '/widgets/shared/components.dart';
 import '/widgets/shared/drawer.dart';
 import '../models/ai_message.dart';
 import '../widgets/chat/chat_message.dart';
-import '../widgets/chat/ai_final_message.dart';
 
 class HotelOnboardingBot extends StatefulWidget {
   const HotelOnboardingBot({super.key});

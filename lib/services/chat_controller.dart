@@ -1,5 +1,4 @@
 import '../models/property_details.dart';
-import '../models/room.dart';
 import '../models/branding.dart';
 import 'onboarding_step.dart';
 
@@ -7,8 +6,6 @@ class ChatController {
   OnboardingStep _currentStep = OnboardingStep.welcome;
   final Map<OnboardingStep, dynamic> _responses = {};
 
-  final List<Room> _rooms = [];
-  Room? _tempRoom;
   int? _totalRoomTypes = 0;
   int _currentRoomIndex = 1;
   int _totalRooms = 0;
@@ -21,7 +18,6 @@ class ChatController {
   }
 
   Map<OnboardingStep, dynamic> get responses => _responses;
-  List<Room> get rooms => _rooms;
   int? get totalRoomTypes => _totalRoomTypes;
   int get totalRooms => _totalRooms;
 
@@ -77,7 +73,7 @@ class ChatController {
         themeColor: '#336699', // Default fallback
       ),
       roomTypes: [],
-      rooms: _rooms,
+      rooms: const [],
     );
   }
 
@@ -94,8 +90,6 @@ class ChatController {
   void reset() {
     _currentStep = OnboardingStep.welcome;
     _responses.clear();
-    _rooms.clear();
-    _tempRoom = null;
     _totalRoomTypes = null;
     _currentRoomIndex = 1;
     _totalRooms = 0;
