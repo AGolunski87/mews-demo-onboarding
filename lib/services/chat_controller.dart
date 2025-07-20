@@ -11,6 +11,7 @@ class ChatController {
   Room? _tempRoom;
   int? _totalRoomTypes = 0;
   int _currentRoomIndex = 1;
+  int _totalRooms = 0;
 
   OnboardingStep get currentStep => _currentStep;
 
@@ -22,6 +23,11 @@ class ChatController {
   Map<OnboardingStep, dynamic> get responses => _responses;
   List<Room> get rooms => _rooms;
   int? get totalRoomTypes => _totalRoomTypes;
+  int get totalRooms => _totalRooms;
+
+  void setTotalRooms(int count) {
+    _totalRooms = count;
+  }
 
   void saveResponse(dynamic value) {
     switch (_currentStep) {
@@ -61,7 +67,7 @@ class ChatController {
       propertyName: _responses[OnboardingStep.propertyName],
       propertyType: '', // No longer asked
       region: _responses[OnboardingStep.propertyLocation],
-      numberOfRooms: _rooms.length,
+      numberOfRooms: _totalRooms,
       featureFocus: List<String>.from(
         _responses[OnboardingStep.featureFocus] ?? [],
       ),
@@ -92,5 +98,6 @@ class ChatController {
     _tempRoom = null;
     _totalRoomTypes = null;
     _currentRoomIndex = 1;
+    _totalRooms = 0;
   }
 }
