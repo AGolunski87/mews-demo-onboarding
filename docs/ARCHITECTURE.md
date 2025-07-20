@@ -17,7 +17,7 @@ displays a minimal demo dashboard.
 lib/
   main.dart             Entry point. Creates `MyApp` and loads `IndexPage`.
   models/               Data models used throughout the app.
-  screens/              Top level UI pages (chat bot, dashboard, preview).
+  screens/              Top level UI pages (chat bot and demo pages).
   services/             Non-UI logic such as the onboarding controller.
   widgets/              Reusable UI widgets.
 ```
@@ -32,11 +32,11 @@ and displays `IndexPage` as the home screen.
 - `index.dart` – Returns the main `HotelOnboardingBot` widget.
 - `chatbot_ui.dart` – Stateful widget implementing the chat interface.
   Handles message sending, stores chat messages and navigates to the demo
-  dashboard once the onboarding is complete.
+ dashboard once the onboarding is complete.
 - `demo_dashboard.dart` – Simple page shown after onboarding. Displays the
   generated property name and a back button.
-- `onboarding_preview.dart` – Standalone preview of the onboarding form without
-the chat logic. Mainly used for early UI iterations.
+- `booking_page.dart`, `front_desk.dart` and `housekeeping.dart` – lightweight
+  demo screens that show example UI for common hotel workflows.
 
 ### lib/models/
 
@@ -67,19 +67,18 @@ Reusable building blocks for the UI.
   a room type. Contains text fields for occupancy, price etc.
 - `shared/drawer.dart` – Side drawer visible next to the chat. Shows progress
   summary, allows editing room types and finishing the setup.
-- `shared/chips.dart` – Simple component rendering selectable feature chips.
 
 ## How the Chatbot Works
 
-1. `ChatController` starts with `_currentStep` set to `propertyName` and
-   contains a `_responses` map for storing answers.
-2. `HotelOnboardingBot` initialises with a few system messages in `_messages`.
-3. When the user sends a message, `_handleMessageSend` records the answer via
-   `chatController.saveResponse`. This advances `_currentStep` and updates the
-   prompt.
-4. Once all questions are answered the controller builds a `PropertyDetails`
-   instance. The UI then shows a short animation and navigates to
-   `DemoDashboard`.
+1. `ChatController` starts with `_currentStep` set to `welcome` and stores
+   responses in a map keyed by step.
+2. `HotelOnboardingBot` initialises with the first prompt already in the chat
+   list.
+3. When the user sends a message, `_handleMessageSend` saves the response via
+   `chatController.saveResponse` which also advances to the next step.
+4. When the final summary step is reached the controller builds a
+   `PropertyDetails` instance (only basic fields are filled). The UI then shows a
+   short animation and navigates to `DemoDashboard`.
 
 ## Running the App
 
