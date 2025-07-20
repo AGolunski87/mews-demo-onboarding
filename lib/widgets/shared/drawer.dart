@@ -173,6 +173,13 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                         key: ValueKey('room-type-${i + 1}'),
                         typeName: defaultRoomTypes[i],
                         editableName: true,
+                        initialCount:
+                            roomTypeToCount[defaultRoomTypes[i]] ?? 1,
+                        onCountChanged: (count) {
+                          setState(() {
+                            roomTypeToCount[defaultRoomTypes[i]] = count;
+                          });
+                        },
                       ),
                     const SizedBox(height: 20),
                     if (_botTyping)
