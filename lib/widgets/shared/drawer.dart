@@ -4,7 +4,7 @@ import 'RoomTypeEditorCard.dart';
 class RoomTypeDrawer extends StatefulWidget {
   final int numberOfRoomTypes;
   final String summaryText;
-  final Function(int totalRooms) onFinish;
+  final void Function(int totalRooms) onFinish;
 
   const RoomTypeDrawer({
     super.key,
