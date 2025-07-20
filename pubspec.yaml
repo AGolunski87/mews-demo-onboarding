@@ -30,4 +30,6 @@ flutter:
     - web/assets/
     - assets/rooms/
     - assets/logo/
-  
+    - assets/building.json
+
+

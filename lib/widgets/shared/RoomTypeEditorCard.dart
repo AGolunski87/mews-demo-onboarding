@@ -1,17 +1,19 @@
+// ===========================
+// 2. widgets/shared/RoomTypeEditorCard.dart
+// ===========================
 import 'package:flutter/material.dart';
+import '../../models/room_type.dart';
 
 class RoomTypeEditorCard extends StatefulWidget {
   final String typeName;
   final bool editableName;
-  final int initialCount;
-  final ValueChanged<int>? onCountChanged;
+  final ValueChanged<RoomType>? onRoomTypeChanged;
 
   const RoomTypeEditorCard({
     super.key,
     required this.typeName,
     this.editableName = false,
-    this.initialCount = 1,
-    this.onCountChanged,
+    this.onRoomTypeChanged,
   });
 
   @override
@@ -20,24 +22,39 @@ class RoomTypeEditorCard extends StatefulWidget {
 
 class _RoomTypeEditorCardState extends State<RoomTypeEditorCard> {
   late TextEditingController _nameController;
-  late TextEditingController _countController;
+  late TextEditingController _priceController;
+  late TextEditingController _roomCountController;
+  late TextEditingController _occupancyController;
   bool _editingName = false;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.typeName);
-    _countController =
-        TextEditingController(text: widget.initialCount.toString());
+    _priceController = TextEditingController();
+    _roomCountController = TextEditingController();
+    _occupancyController = TextEditingController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _notifyChange());
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _countController.dispose();
-    super.dispose();
+  void _notifyChange() {
+    final name = _nameController.text.trim();
+    final price = double.tryParse(_priceController.text.trim()) ?? 0.0;
+    final roomCount = int.tryParse(_roomCountController.text.trim()) ?? 0;
+    final occupancy = int.tryParse(_occupancyController.text.trim()) ?? 0;
+
+    if (widget.onRoomTypeChanged != null) {
+      widget.onRoomTypeChanged!(
+        RoomType(
+          name: name,
+          pricePerNight: price,
+          numberOfRooms: roomCount,
+          maxOccupancy: occupancy,
+        ),
+      );
+    }
   }
-  // Removed invalid constructor and field declaration.
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +62,7 @@ class _RoomTypeEditorCardState extends State<RoomTypeEditorCard> {
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -56,6 +73,7 @@ class _RoomTypeEditorCardState extends State<RoomTypeEditorCard> {
                         ? TextField(
                             controller: _nameController,
                             autofocus: true,
+                            onChanged: (_) => _notifyChange(),
                             onSubmitted: (_) =>
                                 setState(() => _editingName = false),
                             decoration: const InputDecoration(
@@ -79,63 +97,42 @@ class _RoomTypeEditorCardState extends State<RoomTypeEditorCard> {
                     ),
                   ),
             const SizedBox(height: 12),
-
+            TextField(
+              controller: _priceController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Price Per Night",
+                prefixText: "\$",
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (_) => _notifyChange(),
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _countController,
+                    controller: _roomCountController,
+                    keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: "# of Rooms",
+                      labelText: "Number of Rooms",
                       border: OutlineInputBorder(),
                     ),
-                    keyboardType: TextInputType.number,
-                    onChanged: (val) {
-                      final count = int.tryParse(val) ?? 0;
-                      widget.onCountChanged?.call(count);
-                    },
+                    onChanged: (_) => _notifyChange(),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: TextField(
+                    controller: _occupancyController,
+                    keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: "Occupancy",
+                      labelText: "Max Occupancy",
                       suffixText: "guests",
                       border: OutlineInputBorder(),
                     ),
-                    keyboardType: TextInputType.number,
+                    onChanged: (_) => _notifyChange(),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: "Nightly Rate",
-                      prefixText: "\$",
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-                const SizedBox(width: 16),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Text("Upload Room Image:"),
-                const SizedBox(width: 12),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.image),
-                  label: const Text("Add Image"),
-                  onPressed: () {},
                 ),
               ],
             ),
@@ -143,5 +140,14 @@ class _RoomTypeEditorCardState extends State<RoomTypeEditorCard> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    _roomCountController.dispose();
+    _occupancyController.dispose();
+    super.dispose();
   }
 }

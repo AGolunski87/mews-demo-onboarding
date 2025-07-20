@@ -9,13 +9,13 @@ part of 'room_type.dart';
 RoomType _$RoomTypeFromJson(Map<String, dynamic> json) => RoomType(
   name: json['name'] as String,
   pricePerNight: (json['pricePerNight'] as num).toDouble(),
-  housekeepingTimeMinutes: (json['housekeepingTimeMinutes'] as num).toInt(),
-  images: (json['images'] as List<dynamic>).map((e) => e as String).toList(),
+  numberOfRooms: (json['numberOfRooms'] as num).toInt(),
+  maxOccupancy: (json['maxOccupancy'] as num).toInt(),
 );
 
 Map<String, dynamic> _$RoomTypeToJson(RoomType instance) => <String, dynamic>{
   'name': instance.name,
   'pricePerNight': instance.pricePerNight,
-  'housekeepingTimeMinutes': instance.housekeepingTimeMinutes,
-  'images': instance.images,
+  'numberOfRooms': instance.numberOfRooms,
+  'maxOccupancy': instance.maxOccupancy,
 };

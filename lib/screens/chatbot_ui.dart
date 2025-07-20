@@ -3,6 +3,7 @@ import 'package:lottie/lottie.dart';
 import '../services/chat_controller.dart';
 import '../services/onboarding_step.dart';
 import '../models/property_details.dart';
+import '../models/room_type.dart';
 import 'demo_dashboard.dart';
 import '/widgets/shared/drawer.dart';
 import '../models/ai_message.dart';
@@ -17,14 +18,12 @@ class HotelOnboardingBot extends StatefulWidget {
 
 class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
   final TextEditingController _textController = TextEditingController();
-  final FocusNode _focusNode = FocusNode(); // ✅ Keep focus
-  final ScrollController _scrollController =
-      ScrollController(); // ✅ Scroll control
+  final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
 
   final ChatController chatController = ChatController();
   final List<AiMessage> _messages = [];
 
-  @override
   @override
   void initState() {
     super.initState();
@@ -52,9 +51,8 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
       }
 
       _textController.clear();
-
-      // ✅ Restore focus and scroll
       _focusNode.requestFocus();
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -75,7 +73,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Lottie.asset(
-              "web/assets/building.json",
+              "assets/building.json",
               repeat: false,
               onLoaded: (_) async {
                 await Future.delayed(const Duration(seconds: 2));
@@ -140,7 +138,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                Lottie.asset('web/assets/bot.json', height: 100),
+                Lottie.asset('assets/bot.json', height: 100),
                 const SizedBox(height: 8),
                 const Text(
                   "Onboarding Wizard",
@@ -155,7 +153,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: ListView.builder(
-                      controller: _scrollController, // ✅ scrolls automatically
+                      controller: _scrollController,
                       itemCount: _messages.length,
                       itemBuilder: (context, index) {
                         final msg = _messages[index];
@@ -171,7 +169,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                       Expanded(
                         child: TextField(
                           controller: _textController,
-                          focusNode: _focusNode, // ✅ maintains focus
+                          focusNode: _focusNode,
                           onSubmitted: _handleMessageSend,
                           decoration: const InputDecoration(
                             hintText: 'Your answer here...',
@@ -191,7 +189,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
             ),
           ),
 
-          // Right Panel — Fixed Drawer w/ Summary at Top
+          // Right Panel — Summary & Room Drawer
           Container(
             width: 360,
             height: double.infinity,
@@ -215,17 +213,29 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                   child: RoomTypeDrawer(
                     numberOfRoomTypes: chatController.totalRoomTypes ?? 4,
                     summaryText: '',
-                    onFinish: (totalRooms) {
-                      chatController.setTotalRooms(totalRooms);
+                    onFinish: (List<RoomType> roomTypes) {
+                      chatController.setRoomTypes(roomTypes);
                       chatController.saveResponse('done');
                       chatController.finalizeSetup();
-                      final nextStep = chatController.currentStep;
+
+                      final summary = chatController.getReadableSummary();
+                      final details = chatController.buildPropertyDetails();
 
                       setState(() {
                         _messages.add(AiMessage.user("✅ Room setup complete"));
+                        _messages.add(
+                          AiMessage.ai(
+                            "📝 Here's your property summary:\n\n$summary",
+                          ),
+                        );
 
-                        if (nextStep == OnboardingStep.summaryConfirm) {
-                          final details = chatController.buildPropertyDetails();
+                        final alreadyCalled = _messages.any(
+                          (m) =>
+                              m.isFunctionCall &&
+                              m.functionName == 'generateDemo',
+                        );
+
+                        if (!alreadyCalled) {
                           _messages.add(
                             AiMessage.functionCall(
                               functionName: "generateDemo",
@@ -233,11 +243,8 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                             ),
                           );
                           _showScrollDialog(context);
-                        } else {
-                          _messages.add(AiMessage.ai(chatController.prompt));
                         }
 
-                        // Ensure scroll to bottom after drawer finish
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           _scrollController.animateTo(
                             _scrollController.position.maxScrollExtent,

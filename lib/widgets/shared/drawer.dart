@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../models/room_type.dart';
 import 'RoomTypeEditorCard.dart';
 
 class RoomTypeDrawer extends StatefulWidget {
   final int numberOfRoomTypes;
   final String summaryText;
-  final void Function(int totalRooms) onFinish;
+  final void Function(List<RoomType> roomTypes) onFinish;
 
   const RoomTypeDrawer({
     super.key,
@@ -22,7 +23,6 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
   int roomCardCount = 0;
   bool _botTyping = false;
 
-  // Predefined room types
   final List<String> defaultRoomTypes = [
     'Big Room',
     'Small Room',
@@ -30,17 +30,14 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
     'Penthouse',
   ];
 
-  final Map<String, int> roomTypeToCount = {
-    'Big Room': 20,
-    'Small Room': 20,
-    'Family Room': 10,
-    'Penthouse': 10,
-  };
+  final List<RoomType?> roomTypeStates = [];
 
   @override
   void initState() {
     super.initState();
     roomCardCount = widget.numberOfRoomTypes;
+    roomTypeStates.length = roomCardCount;
+    roomTypeStates.fillRange(0, roomCardCount, null);
   }
 
   @override
@@ -49,6 +46,7 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
     if (widget.numberOfRoomTypes != oldWidget.numberOfRoomTypes) {
       setState(() {
         roomCardCount = widget.numberOfRoomTypes;
+        roomTypeStates.length = roomCardCount;
       });
     }
   }
@@ -56,8 +54,8 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
   void addRoom() {
     setState(() {
       roomCardCount++;
-      defaultRoomTypes.add("New Room ${roomCardCount}");
-      roomTypeToCount["New Room ${roomCardCount}"] = 1;
+      defaultRoomTypes.add("New Room $roomCardCount");
+      roomTypeStates.add(null);
     });
   }
 
@@ -65,10 +63,33 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
     setState(() => isComplete = false);
   }
 
+  bool _allCardsValid() {
+    return roomTypeStates.every(
+      (room) =>
+          room != null &&
+          room!.name.trim().isNotEmpty &&
+          room.pricePerNight > 0 &&
+          room.numberOfRooms > 0 &&
+          room.maxOccupancy > 0,
+    );
+  }
+
   void completeSetup() {
+    if (!_allCardsValid()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please complete all room cards')),
+      );
+      return;
+    }
+
     setState(() => _botTyping = true);
     Future.delayed(const Duration(milliseconds: 600), () {
-      widget.onFinish(totalRooms);
+      final completed = roomTypeStates.whereType<RoomType>().toList();
+
+      widget.onFinish(completed);
+
+      print('✅ onFinish called with ${completed.length} room types');
+
       if (mounted) {
         setState(() {
           _botTyping = false;
@@ -78,12 +99,10 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
     });
   }
 
-  int get totalRooms {
-    return roomTypeToCount.values.fold(0, (sum, val) => sum + val);
-  }
-
   @override
   Widget build(BuildContext context) {
+    final totalValidRooms = roomTypeStates.whereType<RoomType>().length;
+
     return Container(
       width: 400,
       height: double.infinity,
@@ -122,7 +141,7 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                     if (widget.summaryText.trim().isNotEmpty)
                       const SizedBox(height: 8),
                     Text(
-                      "Total Rooms: $totalRooms",
+                      "Room Types: $totalValidRooms",
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
@@ -173,11 +192,9 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                         key: ValueKey('room-type-${i + 1}'),
                         typeName: defaultRoomTypes[i],
                         editableName: true,
-                        initialCount:
-                            roomTypeToCount[defaultRoomTypes[i]] ?? 1,
-                        onCountChanged: (count) {
+                        onRoomTypeChanged: (room) {
                           setState(() {
-                            roomTypeToCount[defaultRoomTypes[i]] = count;
+                            roomTypeStates[i] = room;
                           });
                         },
                       ),

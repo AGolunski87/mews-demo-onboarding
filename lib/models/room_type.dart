@@ -1,3 +1,6 @@
+// ===========================
+// 1. models/room_type.dart
+// ===========================
 import 'package:json_annotation/json_annotation.dart';
 
 part 'room_type.g.dart';
@@ -6,33 +9,17 @@ part 'room_type.g.dart';
 class RoomType {
   final String name;
   final double pricePerNight;
-  final int housekeepingTimeMinutes;
-  final List<String> images;
+  final int numberOfRooms;
+  final int maxOccupancy;
 
   RoomType({
     required this.name,
     required this.pricePerNight,
-    required this.housekeepingTimeMinutes,
-    required this.images,
+    required this.numberOfRooms,
+    required this.maxOccupancy,
   });
 
   factory RoomType.fromJson(Map<String, dynamic> json) =>
       _$RoomTypeFromJson(json);
-
   Map<String, dynamic> toJson() => _$RoomTypeToJson(this);
-
-  RoomType copyWith({
-    String? name,
-    double? pricePerNight,
-    int? housekeepingTimeMinutes,
-    List<String>? images,
-  }) {
-    return RoomType(
-      name: name ?? this.name,
-      pricePerNight: pricePerNight ?? this.pricePerNight,
-      housekeepingTimeMinutes:
-          housekeepingTimeMinutes ?? this.housekeepingTimeMinutes,
-      images: images ?? this.images,
-    );
-  }
 }
