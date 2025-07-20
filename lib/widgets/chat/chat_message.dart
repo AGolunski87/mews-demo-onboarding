@@ -9,20 +9,17 @@ class ChatMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isBot = !message.isUser;
     return Align(
-      alignment:
-          message.isUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment:
-            message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: message.isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
           if (isBot)
             Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: Image.asset(
-                'web/assets/wizard.png',
-                height: 32,
-              ),
+              child: Image.asset('web/assets/wizard.png', height: 32),
             ),
           Flexible(
             child: Container(
@@ -33,10 +30,8 @@ class ChatMessage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                message.text,
-                style: TextStyle(
-                  color: message.isUser ? Colors.white : Colors.black,
-                ),
+                message.text ?? '',
+                style: const TextStyle(fontSize: 16),
               ),
             ),
           ),

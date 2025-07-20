@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'chatbot_ui.dart'; // Extracted class for clarity
-import 'onboarding_preview.dart';
 
 class IndexPage extends StatelessWidget {
   const IndexPage({super.key});

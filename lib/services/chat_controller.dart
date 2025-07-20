@@ -4,7 +4,7 @@ import '../models/branding.dart';
 import 'onboarding_step.dart';
 
 class ChatController {
-  OnboardingStep _currentStep = OnboardingStep.propertyName;
+  OnboardingStep _currentStep = OnboardingStep.welcome;
   final Map<OnboardingStep, dynamic> _responses = {};
 
   final List<Room> _rooms = [];
@@ -25,38 +25,50 @@ class ChatController {
 
   void saveResponse(dynamic value) {
     switch (_currentStep) {
-      case OnboardingStep.numberOfRoomsTypes:
+      case OnboardingStep.numberOfRoomTypes:
         _totalRoomTypes = int.tryParse(value.toString());
         break;
       default:
         _responses[_currentStep] = value;
     }
+
     _advanceStep();
   }
 
   void _advanceStep() {
-    final allSteps = OnboardingStep.values;
-    int currentIndex = allSteps.indexOf(_currentStep);
-    if (currentIndex < allSteps.length - 1) {
-      _currentStep = allSteps[currentIndex + 1];
+    final steps = OnboardingStep.values;
+    int currentIndex = steps.indexOf(_currentStep);
+
+    // Stop to wait for user to finish drawer setup
+    if (_currentStep == OnboardingStep.numberOfRoomTypes) {
+      _currentStep = OnboardingStep.roomCardInstructions;
+      return;
+    }
+
+    if (currentIndex < steps.length - 1) {
+      _currentStep = steps[currentIndex + 1];
+    }
+  }
+
+  void finalizeSetup() {
+    if (_currentStep == OnboardingStep.roomCardInstructions) {
+      _advanceStep(); // Proceed to summaryConfirm
     }
   }
 
   PropertyDetails buildPropertyDetails() {
     return PropertyDetails(
       propertyName: _responses[OnboardingStep.propertyName],
-      propertyType: _responses[OnboardingStep.propertyType],
-      region: _responses[OnboardingStep.region],
+      propertyType: '', // No longer asked
+      region: _responses[OnboardingStep.propertyLocation],
       numberOfRooms: _rooms.length,
       featureFocus: List<String>.from(
         _responses[OnboardingStep.featureFocus] ?? [],
       ),
-      facilities: List<String>.from(
-        _responses[OnboardingStep.facilities] ?? [],
-      ),
+      facilities: const [], // No longer collected
       branding: Branding(
-        logoUrl: _responses[OnboardingStep.brandingLogo] ?? '',
-        themeColor: _responses[OnboardingStep.brandingColor] ?? '#336699',
+        logoUrl: '', // Not collected
+        themeColor: '#336699', // Default fallback
       ),
       roomTypes: [],
       rooms: _rooms,
@@ -64,22 +76,17 @@ class ChatController {
   }
 
   String getReadableSummary() {
-    final name = _responses[OnboardingStep.propertyName] ?? 'My property';
-    final type = _responses[OnboardingStep.propertyType] ?? 'a hotel';
-    final count = _totalRoomTypes ?? _rooms.length;
-    final region = _responses[OnboardingStep.region] ?? 'an unknown location';
-    return "My property, $name, $type with $count rooms in $region.";
-  }
+    final name = _responses[OnboardingStep.propertyName];
+    final region = _responses[OnboardingStep.propertyLocation];
+    final count = _totalRoomTypes;
 
-  void finalizeSetup() {
-    // Optional: logging or local completion marker
-    if (_currentStep == OnboardingStep.numberOfRoomsTypes) {
-      _advanceStep();
-    }
+    if (name == null || region == null || count == null) return '';
+
+    return "$name, with $count room types in $region.";
   }
 
   void reset() {
-    _currentStep = OnboardingStep.propertyName;
+    _currentStep = OnboardingStep.welcome;
     _responses.clear();
     _rooms.clear();
     _tempRoom = null;

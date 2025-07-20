@@ -8,6 +8,7 @@ import '/widgets/shared/components.dart';
 import '/widgets/shared/drawer.dart';
 import '../models/ai_message.dart';
 import '../widgets/chat/chat_message.dart';
+import '../widgets/chat/ai_final_message.dart';
 
 class HotelOnboardingBot extends StatefulWidget {
   const HotelOnboardingBot({super.key});
@@ -18,18 +19,18 @@ class HotelOnboardingBot extends StatefulWidget {
 
 class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
   final TextEditingController _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode(); // ✅ Keep focus
+  final ScrollController _scrollController =
+      ScrollController(); // ✅ Scroll control
+
   final ChatController chatController = ChatController();
   final List<AiMessage> _messages = [];
 
   @override
+  @override
   void initState() {
     super.initState();
-    _messages.addAll([
-      AiMessage.system(
-        "🧙‍♂️ Welcome, I can get you started with Mews in seconds.",
-      ),
-      AiMessage.ai(chatController.prompt),
-    ]);
+    _messages.add(AiMessage.ai(chatController.prompt));
   }
 
   void _handleMessageSend(String input) {
@@ -49,10 +50,20 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
         );
         _showScrollDialog(context);
       } else {
-        _messages.add(AiMessage.ai(chatController.prompt));
+        _messages.add(AiMessage.custom(const AiFinalMessage()));
       }
 
       _textController.clear();
+
+      // ✅ Restore focus and scroll
+      _focusNode.requestFocus();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
     });
   }
 
@@ -96,34 +107,63 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F0E7),
+      backgroundColor: const Color(0xFFF6F6F6),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 72,
+        leadingWidth: 180,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: Image.asset(
+            'assets/logo/wizard.png',
+            height: 100,
+            fit: BoxFit.fitHeight,
+          ),
+        ),
+        title: const Text(
+          'Onboarding Wizard',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
+        ),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(height: 1, thickness: 1, color: Colors.grey),
+        ),
+      ),
       body: Row(
         children: [
-          // Left: Chat Area
+          // Left Panel — Chat area
           Expanded(
+            flex: 3,
             child: Column(
               children: [
-                const SizedBox(height: 40),
-                Lottie.asset('web/assets/bot.json', height: 120),
+                const SizedBox(height: 20),
+                Lottie.asset('web/assets/bot.json', height: 100),
+                const SizedBox(height: 8),
                 const Text(
                   "Onboarding Wizard",
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Serif',
                   ),
                 ),
+                const SizedBox(height: 12),
                 Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: ListView.builder(
+                      controller: _scrollController, // ✅ scrolls automatically
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        final msg = _messages[index];
+                        return ChatMessage(message: msg);
+                      },
                     ),
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      final msg = _messages[index];
-                      return ChatMessage(message: msg);
-                    },
                   ),
                 ),
                 Padding(
@@ -133,6 +173,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                       Expanded(
                         child: TextField(
                           controller: _textController,
+                          focusNode: _focusNode, // ✅ maintains focus
                           onSubmitted: _handleMessageSend,
                           decoration: const InputDecoration(
                             hintText: 'Your answer here...',
@@ -152,31 +193,64 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
             ),
           ),
 
-          // Right: Always-Visible Drawer
-          RoomTypeDrawer(
-            numberOfRoomTypes: chatController.totalRoomTypes ?? 4,
-            summaryText: chatController.getReadableSummary(),
-            onFinish: () {
-              chatController.saveResponse('done');
-              final nextStep = chatController.currentStep;
-
-              setState(() {
-                _messages.add(AiMessage.user("✅ Room setup complete"));
-
-                if (nextStep == OnboardingStep.summaryConfirm) {
-                  final details = chatController.buildPropertyDetails();
-                  _messages.add(
-                    AiMessage.functionCall(
-                      functionName: "generateDemo",
-                      arguments: details.toJson().toString(),
+          // Right Panel — Fixed Drawer w/ Summary at Top
+          Container(
+            width: 360,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(left: BorderSide(color: Colors.grey, width: 0.5)),
+            ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+                  child: Text(
+                    chatController.getReadableSummary(),
+                    style: const TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.black87,
                     ),
-                  );
-                  _showScrollDialog(context);
-                } else {
-                  _messages.add(AiMessage.ai(chatController.prompt));
-                }
-              });
-            },
+                  ),
+                ),
+                Expanded(
+                  child: RoomTypeDrawer(
+                    numberOfRoomTypes: chatController.totalRoomTypes ?? 4,
+                    summaryText: '',
+                    onFinish: () {
+                      chatController.saveResponse('done');
+                      final nextStep = chatController.currentStep;
+
+                      setState(() {
+                        _messages.add(AiMessage.user("✅ Room setup complete"));
+
+                        if (nextStep == OnboardingStep.summaryConfirm) {
+                          final details = chatController.buildPropertyDetails();
+                          _messages.add(
+                            AiMessage.functionCall(
+                              functionName: "generateDemo",
+                              arguments: details.toJson().toString(),
+                            ),
+                          );
+                          _showScrollDialog(context);
+                        } else {
+                          _messages.add(AiMessage.ai(chatController.prompt));
+                        }
+
+                        // Ensure scroll to bottom after drawer finish
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _scrollController.animateTo(
+                            _scrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
+                          );
+                        });
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
