@@ -62,6 +62,7 @@ class UserInputService {
     final name = responses['propertyName']?.toString().trim() ?? '';
     final type = responses['propertyType']?.toString().trim() ?? '';
     final region = responses['region']?.toString().trim() ?? '';
+    final propertyType = name.isNotEmpty ? "**$name**" : "";
     final summary = responses['propertySummary']?.toString().trim() ?? '';
 
     final totalRooms = roomTypes.fold<int>(
@@ -74,14 +75,14 @@ class UserInputService {
         ? "\$${rate.toStringAsFixed(2)}/night"
         : "TBD";
 
-    final namePart = name.isNotEmpty ? "**$name**" : "This property";
-    final typePart = type.isNotEmpty ? "a ${type.toLowerCase()}" : "a property";
+    final namePart = name.isNotEmpty ? "**$name**" : "";
+    final typePart = type.isNotEmpty ? "a ${type.toLowerCase()}" : "";
     final locationPart = region.isNotEmpty ? "located in **$region**" : "";
 
     final description = summary.isNotEmpty ? "$summary\n\n" : "";
 
-    return "$description🏨 $namePart is $typePart with **$totalRooms room${totalRooms != 1 ? 's' : ''}**, "
-        "$locationPart.\n💰 Rates start from **$rateFormatted**";
+    return "$description Hotel Chocolate is a romantic boutique with $totalRooms room${totalRooms != 1 ? 's' : ''}, "
+        "$locationPart.\n Rates start from $rateFormatted";
   }
 
   void clear() {

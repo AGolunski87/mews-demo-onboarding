@@ -6,11 +6,11 @@ enum OnboardingStep {
   propertyName,
   propertyLocation,
   propertyType,
+  propertySummary,
   featureFocus,
   numberOfRoomTypes,
   roomCardInstructions,
   summaryConfirm,
-  propertySummary,
 }
 
 final Map<OnboardingStep, String> onboardingPrompts = {

@@ -3,7 +3,7 @@ import 'package:lottie/lottie.dart';
 
 import '../services/chat_controller.dart';
 import '../services/onboarding_step.dart';
-import '../services/demo_builder_service.dart'; // ✅ NEW
+import '../services/demo_builder_service.dart';
 import '../models/room_type.dart';
 import '../widgets/shared/drawer.dart';
 import '../models/ai_message.dart';
@@ -179,66 +179,45 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
               color: Colors.white,
               border: Border(left: BorderSide(color: Colors.grey, width: 0.5)),
             ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-                  child: Text(
-                    chatController.getReadableSummary(),
-                    style: const TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: RoomTypeDrawer(
-                    numberOfRoomTypes: chatController.totalRoomTypes ?? 4,
-                    summaryText: '',
-                    onFinish: (List<RoomType> roomTypes) {
-                      chatController.setRoomTypes(roomTypes);
-                      chatController.saveResponse('done');
-                      chatController.finalizeSetup();
+            child: RoomTypeDrawer(
+              numberOfRoomTypes: chatController.totalRoomTypes ?? 4,
+              onFinish: (List<RoomType> roomTypes) {
+                chatController.setRoomTypes(roomTypes);
+                chatController.saveResponse('done');
+                chatController.finalizeSetup();
 
-                      final summary = chatController.getReadableSummary();
-                      final details = DemoBuilderService().buildDemoProperty();
+                final summary = chatController.getReadableSummary();
+                final details = DemoBuilderService().buildDemoProperty();
 
-                      setState(() {
-                        _messages.add(AiMessage.user("✅ Room setup complete"));
-                        _messages.add(
-                          AiMessage.ai(
-                            "Here's your property summary:\n\n$summary",
-                          ),
-                        );
+                setState(() {
+                  _messages.add(AiMessage.user("✅ Room setup complete"));
+                  _messages.add(
+                    AiMessage.ai("Here's your property summary:\n\n$summary"),
+                  );
 
-                        final alreadyCalled = _messages.any(
-                          (m) =>
-                              m.isFunctionCall &&
-                              m.functionName == 'generateDemo',
-                        );
+                  final alreadyCalled = _messages.any(
+                    (m) => m.isFunctionCall && m.functionName == 'generateDemo',
+                  );
 
-                        if (!alreadyCalled) {
-                          _messages.add(
-                            AiMessage.functionCall(
-                              functionName: "generateDemo",
-                              arguments: details.toJson().toString(),
-                            ),
-                          );
-                          _showScrollDialog(context);
-                        }
+                  if (!alreadyCalled) {
+                    _messages.add(
+                      AiMessage.functionCall(
+                        functionName: "generateDemo",
+                        arguments: details.toJson().toString(),
+                      ),
+                    );
+                    _showScrollDialog(context);
+                  }
 
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _scrollController.animateTo(
-                            _scrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeOut,
-                          );
-                        });
-                      });
-                    },
-                  ),
-                ),
-              ],
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                    );
+                  });
+                });
+              },
             ),
           ),
         ],

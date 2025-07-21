@@ -5,13 +5,11 @@ import 'RoomTypeEditorCard.dart';
 
 class RoomTypeDrawer extends StatefulWidget {
   final int numberOfRoomTypes;
-  final String summaryText;
   final void Function(List<RoomType> roomTypes) onFinish;
 
   const RoomTypeDrawer({
     super.key,
     required this.numberOfRoomTypes,
-    required this.summaryText,
     required this.onFinish,
   });
 
@@ -36,7 +34,6 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
     super.initState();
     roomCardCount = widget.numberOfRoomTypes;
 
-    // Ensure we have enough names for the initial cards
     while (defaultRoomTypes.length < roomCardCount) {
       defaultRoomTypes.add("Room Type ${defaultRoomTypes.length + 1}");
     }
@@ -49,7 +46,6 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
       setState(() {
         roomCardCount = widget.numberOfRoomTypes;
 
-        // Again, ensure the name list stays long enough
         while (defaultRoomTypes.length < roomCardCount) {
           defaultRoomTypes.add("Room Type ${defaultRoomTypes.length + 1}");
         }
@@ -72,9 +68,7 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
     final rooms = UserInputService().roomTypes;
 
     for (final r in rooms) {
-      print(
-        "🧪 Room: ${r.name}, \$${r.pricePerNight}, ${r.numberOfRooms} rooms, ${r.maxOccupancy} guests",
-      );
+      print("Room validated: ${r.name}");
     }
 
     return rooms.isNotEmpty &&
@@ -111,8 +105,6 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    final totalValidRooms = UserInputService().roomTypes.length;
-
     return Container(
       width: 400,
       height: double.infinity,
@@ -130,17 +122,6 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 8),
-                    if (widget.summaryText.trim().isNotEmpty)
-                      Text(
-                        widget.summaryText,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    if (widget.summaryText.trim().isNotEmpty)
-                      const SizedBox(height: 8),
                     const SizedBox(height: 16),
                     const Text(
                       "Features",
