@@ -1,19 +1,15 @@
-// ===========================
-// 2. widgets/shared/RoomTypeEditorCard.dart
-// ===========================
 import 'package:flutter/material.dart';
 import '../../models/room_type.dart';
+import '../../services/user_input_service.dart';
 
 class RoomTypeEditorCard extends StatefulWidget {
   final String typeName;
   final bool editableName;
-  final ValueChanged<RoomType>? onRoomTypeChanged;
 
   const RoomTypeEditorCard({
     super.key,
     required this.typeName,
     this.editableName = false,
-    this.onRoomTypeChanged,
   });
 
   @override
@@ -44,16 +40,14 @@ class _RoomTypeEditorCardState extends State<RoomTypeEditorCard> {
     final roomCount = int.tryParse(_roomCountController.text.trim()) ?? 0;
     final occupancy = int.tryParse(_occupancyController.text.trim()) ?? 0;
 
-    if (widget.onRoomTypeChanged != null) {
-      widget.onRoomTypeChanged!(
-        RoomType(
-          name: name,
-          pricePerNight: price,
-          numberOfRooms: roomCount,
-          maxOccupancy: occupancy,
-        ),
-      );
-    }
+    final updatedRoomType = RoomType(
+      name: name,
+      pricePerNight: price,
+      numberOfRooms: roomCount,
+      maxOccupancy: occupancy,
+    );
+
+    UserInputService().addOrUpdateRoomType(updatedRoomType);
   }
 
   @override

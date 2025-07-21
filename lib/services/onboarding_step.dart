@@ -13,7 +13,7 @@ enum OnboardingStep {
 
 final Map<OnboardingStep, String> onboardingPrompts = {
   OnboardingStep.welcome:
-      "🧙‍♂️ Getting started with Mews is really simple.\nI can get you set up in just a few seconds. I’ll need a few details first.",
+      "Getting started with Mews is simple.\nI can get you set up in just a few seconds. I’ll need a few details first.",
   OnboardingStep.email:
       "To prove you're human, please provide a valid email address.",
   OnboardingStep.emailVerify: "✅ Email sent — please verify.",

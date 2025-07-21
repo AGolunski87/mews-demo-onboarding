@@ -8,6 +8,7 @@ class ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isBot = !message.isUser;
+
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Row(
@@ -29,14 +30,43 @@ class ChatMessage extends StatelessWidget {
                 color: message.isUser ? Colors.indigo : Colors.grey[200],
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                message.text ?? '',
-                style: const TextStyle(fontSize: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    message.text ?? '',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  if (message.isFunctionCall) ...[
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        _buildLinkChip(context, "Booking", "/booking"),
+                        _buildLinkChip(context, "Front Desk", "/front-desk"),
+                        _buildLinkChip(
+                          context,
+                          "Housekeeping",
+                          "/housekeeping",
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildLinkChip(BuildContext context, String label, String route) {
+    return ActionChip(
+      label: Text(label),
+      onPressed: () {
+        Navigator.of(context).pushNamed(route);
+      },
     );
   }
 }

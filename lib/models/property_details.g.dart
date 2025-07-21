@@ -18,7 +18,6 @@ PropertyDetails _$PropertyDetailsFromJson(Map<String, dynamic> json) =>
       facilities: (json['facilities'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
-      branding: Branding.fromJson(json['branding'] as Map<String, dynamic>),
       roomTypes: (json['roomTypes'] as List<dynamic>)
           .map((e) => RoomType.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -35,7 +34,6 @@ Map<String, dynamic> _$PropertyDetailsToJson(PropertyDetails instance) =>
       'numberOfRooms': instance.numberOfRooms,
       'featureFocus': instance.featureFocus,
       'facilities': instance.facilities,
-      'branding': instance.branding,
       'roomTypes': instance.roomTypes,
       'rooms': instance.rooms,
     };

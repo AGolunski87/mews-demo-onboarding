@@ -13,7 +13,6 @@ class PropertyDetails {
   final int numberOfRooms;
   final List<String> featureFocus;
   final List<String> facilities;
-  final Branding branding;
 
   final List<RoomType> roomTypes; // e.g., "Deluxe", "Suite", etc.
   final List<Room> rooms; // One entry per room, by number
@@ -25,7 +24,6 @@ class PropertyDetails {
     required this.numberOfRooms,
     required this.featureFocus,
     required this.facilities,
-    required this.branding,
     required this.roomTypes,
     required this.rooms,
   });

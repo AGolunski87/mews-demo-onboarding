@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/room_type.dart';
+import '../../services/user_input_service.dart';
 import 'RoomTypeEditorCard.dart';
 
 class RoomTypeDrawer extends StatefulWidget {
@@ -30,14 +31,15 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
     'Penthouse',
   ];
 
-  final List<RoomType?> roomTypeStates = [];
-
   @override
   void initState() {
     super.initState();
     roomCardCount = widget.numberOfRoomTypes;
-    roomTypeStates.length = roomCardCount;
-    roomTypeStates.fillRange(0, roomCardCount, null);
+
+    // Ensure we have enough names for the initial cards
+    while (defaultRoomTypes.length < roomCardCount) {
+      defaultRoomTypes.add("Room Type ${defaultRoomTypes.length + 1}");
+    }
   }
 
   @override
@@ -46,7 +48,11 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
     if (widget.numberOfRoomTypes != oldWidget.numberOfRoomTypes) {
       setState(() {
         roomCardCount = widget.numberOfRoomTypes;
-        roomTypeStates.length = roomCardCount;
+
+        // Again, ensure the name list stays long enough
+        while (defaultRoomTypes.length < roomCardCount) {
+          defaultRoomTypes.add("Room Type ${defaultRoomTypes.length + 1}");
+        }
       });
     }
   }
@@ -54,8 +60,7 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
   void addRoom() {
     setState(() {
       roomCardCount++;
-      defaultRoomTypes.add("New Room $roomCardCount");
-      roomTypeStates.add(null);
+      defaultRoomTypes.add("Room Type ${defaultRoomTypes.length + 1}");
     });
   }
 
@@ -64,14 +69,22 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
   }
 
   bool _allCardsValid() {
-    return roomTypeStates.every(
-      (room) =>
-          room != null &&
-          room!.name.trim().isNotEmpty &&
-          room.pricePerNight > 0 &&
-          room.numberOfRooms > 0 &&
-          room.maxOccupancy > 0,
-    );
+    final rooms = UserInputService().roomTypes;
+
+    for (final r in rooms) {
+      print(
+        "🧪 Room: ${r.name}, \$${r.pricePerNight}, ${r.numberOfRooms} rooms, ${r.maxOccupancy} guests",
+      );
+    }
+
+    return rooms.isNotEmpty &&
+        rooms.every(
+          (room) =>
+              room.name.trim().isNotEmpty &&
+              room.pricePerNight > 0 &&
+              room.numberOfRooms > 0 &&
+              room.maxOccupancy > 0,
+        );
   }
 
   void completeSetup() {
@@ -84,11 +97,8 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
 
     setState(() => _botTyping = true);
     Future.delayed(const Duration(milliseconds: 600), () {
-      final completed = roomTypeStates.whereType<RoomType>().toList();
-
+      final completed = UserInputService().roomTypes;
       widget.onFinish(completed);
-
-      print('✅ onFinish called with ${completed.length} room types');
 
       if (mounted) {
         setState(() {
@@ -101,7 +111,7 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    final totalValidRooms = roomTypeStates.whereType<RoomType>().length;
+    final totalValidRooms = UserInputService().roomTypes.length;
 
     return Container(
       width: 400,
@@ -150,7 +160,7 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      "⚙️ Feature Focus",
+                      "Feature Focus",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -166,7 +176,7 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      "🏨 Upload Logo",
+                      "Upload Logo",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -180,7 +190,7 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      "🛏 Room Type Setup",
+                      "Room Type Setup",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -188,19 +198,13 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                     ),
                     const SizedBox(height: 12),
                     for (int i = 0; i < roomCardCount; i++)
-                      (() {
-                        final index = i;
-                        return RoomTypeEditorCard(
-                          key: ValueKey('room-type-${index + 1}'),
-                          typeName: defaultRoomTypes[index],
-                          editableName: true,
-                          onRoomTypeChanged: (room) {
-                            setState(() {
-                              roomTypeStates[index] = room;
-                            });
-                          },
-                        );
-                      })(),
+                      RoomTypeEditorCard(
+                        key: ValueKey('room-type-${i + 1}'),
+                        typeName: (i < defaultRoomTypes.length)
+                            ? defaultRoomTypes[i]
+                            : "Room Type ${i + 1}",
+                        editableName: true,
+                      ),
                     const SizedBox(height: 20),
                     if (_botTyping)
                       const Center(

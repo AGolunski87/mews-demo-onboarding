@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+
 import '../services/chat_controller.dart';
 import '../services/onboarding_step.dart';
-import '../models/property_details.dart';
+import '../services/demo_builder_service.dart'; // ✅ NEW
 import '../models/room_type.dart';
-import 'demo_dashboard.dart';
-import '/widgets/shared/drawer.dart';
+import '../widgets/shared/drawer.dart';
 import '../models/ai_message.dart';
 import '../widgets/chat/chat_message.dart';
 
@@ -38,7 +38,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
       chatController.saveResponse(input);
 
       if (chatController.currentStep == OnboardingStep.summaryConfirm) {
-        final details = chatController.buildPropertyDetails();
+        final details = DemoBuilderService().buildDemoProperty();
         _messages.add(
           AiMessage.functionCall(
             functionName: "generateDemo",
@@ -79,7 +79,9 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                 await Future.delayed(const Duration(seconds: 2));
                 if (mounted) {
                   Navigator.of(context).pop();
-                  _navigateToDashboard();
+                  print(
+                    "✅ Demo ready: ${DemoBuilderService().buildDemoProperty().toJson()}",
+                  );
                 }
               },
             ),
@@ -87,15 +89,6 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
             const Text("Unfolding your demo..."),
           ],
         ),
-      ),
-    );
-  }
-
-  void _navigateToDashboard() {
-    final propertyName = chatController.buildPropertyDetails().propertyName;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => DemoDashboard(propertyName: propertyName),
       ),
     );
   }
@@ -132,7 +125,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
       ),
       body: Row(
         children: [
-          // Left Panel — Chat area
+          // Left Panel — Chat
           Expanded(
             flex: 3,
             child: Column(
@@ -189,7 +182,7 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
             ),
           ),
 
-          // Right Panel — Summary & Room Drawer
+          // Right Panel — Drawer
           Container(
             width: 360,
             height: double.infinity,
@@ -219,13 +212,13 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
                       chatController.finalizeSetup();
 
                       final summary = chatController.getReadableSummary();
-                      final details = chatController.buildPropertyDetails();
+                      final details = DemoBuilderService().buildDemoProperty();
 
                       setState(() {
                         _messages.add(AiMessage.user("✅ Room setup complete"));
                         _messages.add(
                           AiMessage.ai(
-                            "📝 Here's your property summary:\n\n$summary",
+                            "Here's your property summary:\n\n$summary",
                           ),
                         );
 

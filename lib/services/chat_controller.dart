@@ -76,7 +76,6 @@ class ChatController {
         _responses[OnboardingStep.featureFocus] ?? [],
       ),
       facilities: const [],
-      branding: Branding(logoUrl: '', themeColor: '#336699'),
       roomTypes: _roomTypes,
       rooms: const [],
     );
