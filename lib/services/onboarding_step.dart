@@ -5,10 +5,12 @@ enum OnboardingStep {
   emailConfirmed,
   propertyName,
   propertyLocation,
+  propertyType,
   featureFocus,
   numberOfRoomTypes,
   roomCardInstructions,
   summaryConfirm,
+  propertySummary,
 }
 
 final Map<OnboardingStep, String> onboardingPrompts = {
@@ -19,7 +21,11 @@ final Map<OnboardingStep, String> onboardingPrompts = {
   OnboardingStep.emailVerify: "✅ Email sent — please verify.",
   OnboardingStep.emailConfirmed: "✅ Email verified successfully.",
   OnboardingStep.propertyName: "What’s the name of your property?",
+  OnboardingStep.propertyType:
+      "What type of property is this? (e.g. Hotel, Hostel, B&B, etc.)",
   OnboardingStep.propertyLocation: "Where is your property located?",
+  OnboardingStep.propertySummary:
+      "how would you describe your property? (e.g. A cozy hotel in the city center)",
   OnboardingStep.featureFocus:
       "Use the chips below to tell me what features you’d like to see (e.g. Booking, Front Desk, Payments).",
 

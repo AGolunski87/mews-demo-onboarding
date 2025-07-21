@@ -130,15 +130,6 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Center(
-                      child: Text(
-                        "Your Property",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                     const SizedBox(height: 8),
                     if (widget.summaryText.trim().isNotEmpty)
                       Text(
@@ -150,17 +141,9 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                       ),
                     if (widget.summaryText.trim().isNotEmpty)
                       const SizedBox(height: 8),
-                    Text(
-                      "Room Types: $totalValidRooms",
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
                     const SizedBox(height: 16),
                     const Text(
-                      "Feature Focus",
+                      "Features",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -190,7 +173,7 @@ class _RoomTypeDrawerState extends State<RoomTypeDrawer> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      "Room Type Setup",
+                      "Configure Rooms",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

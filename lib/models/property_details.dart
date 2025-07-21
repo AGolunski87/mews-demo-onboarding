@@ -13,6 +13,7 @@ class PropertyDetails {
   final int numberOfRooms;
   final List<String> featureFocus;
   final List<String> facilities;
+  final String propertySummary; // e.g., "A cozy hotel in the city center"
 
   final List<RoomType> roomTypes; // e.g., "Deluxe", "Suite", etc.
   final List<Room> rooms; // One entry per room, by number
@@ -26,6 +27,7 @@ class PropertyDetails {
     required this.facilities,
     required this.roomTypes,
     required this.rooms,
+    required this.propertySummary,
   });
 
   factory PropertyDetails.fromJson(Map<String, dynamic> json) =>

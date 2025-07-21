@@ -1,10 +1,8 @@
-// ===========================
-// 3. services/chat_controller.dart
-// ===========================
 import '../models/property_details.dart';
 import '../models/branding.dart';
 import '../models/room_type.dart';
 import 'onboarding_step.dart';
+import 'user_input_service.dart';
 
 class ChatController {
   OnboardingStep _currentStep = OnboardingStep.welcome;
@@ -69,7 +67,7 @@ class ChatController {
   PropertyDetails buildPropertyDetails() {
     return PropertyDetails(
       propertyName: _responses[OnboardingStep.propertyName],
-      propertyType: '',
+      propertyType: _responses[OnboardingStep.propertyType],
       region: _responses[OnboardingStep.propertyLocation],
       numberOfRooms: _totalRooms,
       featureFocus: List<String>.from(
@@ -78,21 +76,12 @@ class ChatController {
       facilities: const [],
       roomTypes: _roomTypes,
       rooms: const [],
+      propertySummary: _responses[OnboardingStep.propertySummary],
     );
   }
 
   String getReadableSummary() {
-    final name = _responses[OnboardingStep.propertyName];
-    final region = _responses[OnboardingStep.propertyLocation];
-    if (name == null || region == null || _roomTypes.isEmpty) return '';
-
-    final roomDescriptions = _roomTypes
-        .map((r) {
-          return "\uD83C\uDFE8 ${r.name} – ${r.numberOfRooms} room(s)\n\uD83D\uDC64 Max Occupancy: ${r.maxOccupancy} guests\n\uD83D\uDCB0 \$${r.pricePerNight.toStringAsFixed(2)} / night";
-        })
-        .join("\n\n");
-
-    return "$name in $region\n\n$roomDescriptions";
+    return UserInputService().getPropertySummary();
   }
 
   void reset() {

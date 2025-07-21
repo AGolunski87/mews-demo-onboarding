@@ -104,8 +104,8 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
         leadingWidth: 180,
         leading: Padding(
           padding: const EdgeInsets.only(left: 20),
-          child: Image.asset(
-            'assets/logo/wizard.png',
+          child: Lottie.asset(
+            'web/assets/bot.json',
             height: 100,
             fit: BoxFit.fitHeight,
           ),
@@ -130,17 +130,6 @@ class _HotelOnboardingBotState extends State<HotelOnboardingBot> {
             flex: 3,
             child: Column(
               children: [
-                const SizedBox(height: 20),
-                Lottie.asset('assets/bot.json', height: 100),
-                const SizedBox(height: 8),
-                const Text(
-                  "Onboarding Wizard",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Serif',
-                  ),
-                ),
                 const SizedBox(height: 12),
                 Expanded(
                   child: Padding(
