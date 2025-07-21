@@ -27,7 +27,9 @@ class ChatMessage extends StatelessWidget {
               margin: const EdgeInsets.symmetric(vertical: 4),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: message.isUser ? Colors.indigo : Colors.grey[200],
+                color: message.isUser
+                    ? Colors.indigo
+                    : const Color.fromARGB(255, 255, 255, 255),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -35,7 +37,12 @@ class ChatMessage extends StatelessWidget {
                 children: [
                   Text(
                     message.text ?? '',
-                    style: const TextStyle(fontSize: 16),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: message.isUser
+                          ? Colors.white
+                          : const Color.fromARGB(221, 0, 0, 0),
+                    ),
                   ),
                   if (message.isFunctionCall) ...[
                     const SizedBox(height: 12),
